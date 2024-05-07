@@ -1,19 +1,26 @@
 package com.example.web_banhang.Services;
 
+import com.example.web_banhang.model.Dto.JwtResponse;
 import com.example.web_banhang.model.Dto.LoginResponseDto;
 import com.example.web_banhang.model.ApplicationUser;
+import com.example.web_banhang.model.Dto.RefreshTokenRequest;
+import com.example.web_banhang.model.RefreshToken;
 import com.example.web_banhang.model.Roles;
 import com.example.web_banhang.reponsibility.RoleReponsitory;
 import com.example.web_banhang.reponsibility.UserReponsitory;
+import io.jsonwebtoken.Claims;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -27,6 +34,9 @@ public class AuthenticationService {
 
     @Autowired
     private RoleReponsitory roleReponsitory;
+
+    @Autowired
+    private RefreshTokenSerivice refreshTokenService;
 
     @Autowired
     private PasswordEncoder encoder;
@@ -54,13 +64,25 @@ public class AuthenticationService {
             Authentication auth = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(email, password)
             );
+            if (auth.isAuthenticated()) {
+                ApplicationUser user = userReponsitory.findByEmail(email).get();
+                RefreshToken existingRefreshToken = refreshTokenService.findByUser(user.getUsername()).get();
 
-            String token = tokenService.generateJwt(auth);
-
-            return new LoginResponseDto(userReponsitory.findByEmail(email).get(), token);
+                String token;
+                if (existingRefreshToken!=null){
+                    token = tokenService.generateJwt(auth);
+                    return new LoginResponseDto(user, token,existingRefreshToken.getToken());
+                }else {
+                    RefreshToken refreshToken = refreshTokenService.createRefreshToken(email);
+                    token = tokenService.generateJwt(auth);
+                    return new LoginResponseDto(user, token,refreshToken.getToken());
+                }
+            } else {
+                throw new UsernameNotFoundException("invalid user request !");
+            }
 
         } catch(AuthenticationException e){
-            return new LoginResponseDto(null, "");
+            return new LoginResponseDto(null, "",null);
         }
     }
 

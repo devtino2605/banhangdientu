@@ -25,28 +25,28 @@ public class ProductRvServiceImp implements ProductRvService {
     private ProductReponsitory productReponsitory;
 
     @Override
-    public ProductRvDto addRv(ProductReview productReview) {
-        productReview.setCreatedAt(LocalDateTime.now());
-        ProductReview saveprv = productRvReponsitory.save(productReview);
-        return ProductRvMapper.mapToDto(saveprv);
-    }
+    public ProductRvDto addOrUpdateRv(ProductReview productReview) {
+        Optional<ProductReview> productRv = productRvReponsitory.findByProductIdAndUserId(productReview.getProduct().getId(),productReview.getUser().getUserId());
 
-    @Override
-    public ProductRvDto update(int id,ProductReview productReview) {
-        Optional<ProductReview> optionalProductReview = productRvReponsitory.findById(id);
-        if (optionalProductReview.isPresent()) {
-            ProductReview existingProductReview = optionalProductReview.get();
-            existingProductReview.setRating(productReview.getRating());
-            existingProductReview.setUpdatedAt(LocalDateTime.now());
-            // Lưu đối tượng cập nhật vào cơ sở dữ liệu
-            ProductReview updatedProductReview = productRvReponsitory.save(existingProductReview);
-            return ProductRvMapper.mapToDto(updatedProductReview);
-        } else {
-            // Xử lý trường hợp không tìm thấy đối tượng cần cập nhật
-            // Ví dụ: throw một ngoại lệ hoặc trả về null
-            return null;
+        if (productRv.isPresent()){
+            ProductReview existPv = productRv.get();
+            existPv.setRating(productReview.getRating());
+            existPv.setUpdatedAt(LocalDateTime.now());
+            ProductReview updatePv = productRvReponsitory.save(existPv);
+            return ProductRvMapper.mapToDto(updatePv);
+        }else {
+            ProductReview newPv = new ProductReview();
+            newPv.setUser(productReview.getUser()); // Set user
+            newPv.setProduct(productReview.getProduct()); // Set product
+            newPv.setRating(productReview.getRating());
+            newPv.setCreatedAt(LocalDateTime.now());
+
+            ProductReview savedReview = productRvReponsitory.save(newPv);
+
+            return ProductRvMapper.mapToDto(savedReview);
         }
     }
+
 
     @Override
     public List<ProductRvDto> getAllByIdProduct(int productId) {

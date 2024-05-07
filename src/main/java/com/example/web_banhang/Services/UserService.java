@@ -4,6 +4,7 @@ import com.example.web_banhang.model.ApplicationUser;
 import com.example.web_banhang.model.Roles;
 import com.example.web_banhang.reponsibility.UserReponsitory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -16,6 +17,7 @@ import java.util.Set;
 @Service
 public class UserService implements UserDetailsService {
     @Autowired
+    @Lazy
     private PasswordEncoder encoder;
 
     @Autowired

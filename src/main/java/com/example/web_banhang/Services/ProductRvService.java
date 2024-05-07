@@ -7,8 +7,7 @@ import com.example.web_banhang.model.ProductReview;
 import java.util.List;
 
 public interface ProductRvService {
-    ProductRvDto addRv(ProductReview productReview);
-    ProductRvDto update(int id,ProductReview productReview);
+    ProductRvDto addOrUpdateRv(ProductReview productReview);
 
     List<ProductRvDto> getAllByIdProduct(int productId);
 }

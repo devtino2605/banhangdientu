@@ -1,17 +1,19 @@
 package com.example.web_banhang.model.Enum;
 
+import lombok.Getter;
+
+
+@Getter
 public enum DeliveryStatus {
-    PENDING("Đang chờ"),
-    SHIPPED("Đã gửi"),
-    DELIVERED("Đã giao hàng");
+    PENDING(1),
+    ON_THE_WAY(2),
+    DELIVERED(3),
+    CANCELLED(4);
 
-    private final String status;
+    private final int status;
 
-    DeliveryStatus(String status) {
+    DeliveryStatus(int status) {
         this.status = status;
     }
 
-    public String getStatus() {
-        return status;
-    }
 }

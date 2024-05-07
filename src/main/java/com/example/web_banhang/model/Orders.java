@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.*;
 import java.time.LocalDateTime;
 
 @Getter
@@ -26,16 +27,24 @@ public class Orders {
     @JoinColumn(name = "user_id")
     private ApplicationUser user;
 
+    @NotBlank(message = "Full name is required")
+    @Size(max = 255, message = "Full name must be less than or equal to 255 characters")
     private String fullname;
 
+    @NotBlank(message = "Email is required")
+    @Email(message = "Invalid email format")
+    @Size(max = 255, message = "Email must be less than or equal to 255 characters")
     private String email;
 
-    @Column(name = "phone_number")
+    @NotBlank(message = "Phone number is required")
+    @Pattern(regexp = "\\d{10,13}", message = "Invalid phone number format")
     private String phoneNumber;
 
+    @NotBlank(message = "Address is required")
+    @Size(max = 500, message = "Address must be less than or equal to 500 characters")
     private String address;
 
-    private String note;
+    private int num;
 
     @Column(name = "order_date")
     private LocalDateTime orderDate;
@@ -43,7 +52,7 @@ public class Orders {
     private int status;
 
     @Column(name = "total_money")
-    private int totalMoney;
+    private double totalMoney;
 
     // Constructors, getters, setters, etc.
 }

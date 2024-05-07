@@ -1,12 +1,15 @@
 package com.example.web_banhang.configuration;
 
+import com.example.web_banhang.Services.UserService;
 import com.example.web_banhang.Utils.RSAKeyProperties;
+import com.example.web_banhang.filter.JwtAuthFilter;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,11 +31,15 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
-public class SecurityConfiguration {
+public class SecurityConfiguration{
+
+    @Autowired
+    private JwtAuthFilter authFilter;
 
     private final RSAKeyProperties keys;
 
@@ -74,7 +81,9 @@ public class SecurityConfiguration {
                 .jwt().jwtAuthenticationConverter(authenticationConverter());
         http
 //        cho biết rằng không có phiên HTTP sẽ được tạo ra hoặc sử dụng trong quá trình xác thực.
-                .sessionManagement(session ->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                .sessionManagement(session ->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class);
+
 //        ây dựng đối tượng HttpSecurity và trả về một SecurityFilterChain được sử dụng để cấu hình bộ lọc bảo mật
         return http.build();
 

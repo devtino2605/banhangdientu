@@ -23,6 +23,7 @@ public class OrderDetails {
     @ManyToOne
     @JoinColumn(name = "order_id")
     private Orders order;
+    // Constructors, getters, setters, etc.
 
     @NotNull(message = "Product is required")
     @ManyToOne
@@ -32,12 +33,7 @@ public class OrderDetails {
     @Min(value = 0, message = "Price must be a non-negative number")
     private int price;
 
-    @Min(value = 1, message = "Number must be at least 1")
-    private int num;
+    @Min(value = 1, message = "Quantity must be at least 1")
+    private int quantity;
 
-    @Min(value = 0, message = "Total money must be a non-negative number")
-    @Column(name = "total_money")
-    private int totalMoney;
-
-    // Constructors, getters, setters, etc.
 }
